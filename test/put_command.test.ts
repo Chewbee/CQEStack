@@ -1,7 +1,10 @@
+import uuid = require ('uuid');
 
-import cdk = require('@aws-cdk/core');
-import put_command = require('../lambda/put_command') ;
+test('Test put_command test file ', () => {
+  return undefined
+})
 
-test( 'Test put_command', () => {
-    return undefined; 
-});
+test('uuid is working', () => {
+  const uu: string = uuid()
+  expect(uu).not.toBeUndefined()
+})

@@ -1,4 +1,4 @@
-import { uuid } from 'uuidv4'
+import uuid = require ('uuid');
 import AWS = require('aws-sdk');
 const db = new AWS.DynamoDB.DocumentClient()
 
