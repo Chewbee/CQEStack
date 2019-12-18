@@ -1,0 +1,8 @@
+{
+  "name": "put_command",
+  "version": "0.1.0",
+  "devDependencies": {
+    "uuid": "^3.3.3"
+  },
+  "dependencies": {}
+}

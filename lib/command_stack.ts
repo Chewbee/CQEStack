@@ -15,12 +15,16 @@ export class CommandStack extends cdk.Construct {
 
   constructor (scope: cdk.Construct, id: string, props: CommandStackProps = {}) {
     super(scope, id)
+    // S3
 
     // Dynamo DB
     this.ddbTable = new ddb.Table(this, 'CommandsTable', {
       tableName: 'CommandsTable',
       readCapacity: 50,
       serverSideEncryption: true,
+      stream: ddb.StreamViewType.NEW_AND_OLD_IMAGES,
+      pointInTimeRecovery: true,
+
       partitionKey: {
         name: 'itemId',
         type: ddb.AttributeType.STRING
@@ -29,7 +33,10 @@ export class CommandStack extends cdk.Construct {
       // the new table, and it will remain in your account until manually deleted. By setting the policy to
       // DESTROY, cdk destroy will delete the table (even if it has data in it)
       removalPolicy: cdk.RemovalPolicy.DESTROY // NOT recommended for production code
-
+    })
+    this.ddbTable.autoScaleWriteCapacity({
+      minCapacity: 2,
+      maxCapacity: 10
     })
     // Lambda
     const putCommandHandler: lambda.Function = new lambda.Function(this, 'put_command', {
