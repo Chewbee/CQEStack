@@ -20,7 +20,7 @@ export const putCommand = async (event: any = {}): Promise<any> => {
   }
   try {
     await db.put(params).promise()
-    return { statusCode: 201, body: '' }
+    return { statusCode: 201, body: event.body }
   } catch (dbError) {
     const errorResponse = dbError.code === 'ValidationException' && dbError.message.includes('reserved keyword')
       ? DYNAMODB_EXECUTION_ERROR : RESERVED_RESPONSE
