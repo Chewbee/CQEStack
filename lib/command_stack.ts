@@ -55,8 +55,11 @@ export class CommandStack extends cdk.Construct {
     this.lambdaRestApi = new apigw.LambdaRestApi(this, 'restAPI', {
       restApiName: 'Put Command Service',
       description: 'This service receives the command',
+      proxy: false,
       handler: putCommandHandler
     })
+    this.lambdaRestApi.root.addMethod('POST')
+
     this.apiArn = this.lambdaRestApi.arnForExecuteApi()
   };
 };
