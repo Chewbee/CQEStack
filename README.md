@@ -1,4 +1,19 @@
-# Welcome to your CDK TypeScript project!
+# Command Stack pour la plateforme team 
+
+Projet contient:
+- une API GW pour lambda avec 
+- une lambda fonction en POST putCommand
+- une Dynamo DB pour stocker les commandes
+  - stream enabled
+  - cyphered
+
+# How to deploy 
+
+1. `cdk bootstrap` : va installer les truc de base
+2. `cdk synth` : va composer la stack CFn
+3. `cdk deploy` : va déployer la stack 
+
+## From Aws
 
 This is a blank project for TypeScript development with CDK.
 
