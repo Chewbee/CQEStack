@@ -17,7 +17,7 @@ export class CommandStack extends cdk.Construct {
 
   private addAuthorizer (stack: CommandStack) {
     // TOFIX: discover the arn of the cognito pool, instead of using magic number - Pool Id eu-west-1_mhbaJ4zc0
-    stack.authorizer = new CfnAuthorizer(stack, 'USerPool', {
+    stack.authorizer = new CfnAuthorizer(stack, 'UserPool', {
       name: 'UserPoolAuthorizer',
       restApiId: stack.lambdaRestApi.restApiId,
       type: apigw.AuthorizationType.COGNITO,
@@ -76,6 +76,6 @@ export class CommandStack extends cdk.Construct {
       allowTestInvoke: true
     }))
     this.apiArn = this.lambdaRestApi.arnForExecuteApi()
-    this.addAuthorizer(this)
+    // this.addAuthorizer(this)
   };
 };
