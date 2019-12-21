@@ -1,10 +1,12 @@
-import uuid = require ('uuid');
+import { putCommand } from '../lambda/put_command'
+import uuid = require('uuid');
 
-test('Test put_command test file ', () => {
-  return undefined
-})
-
-test('uuid is working', () => {
+describe('uuid is working', () => {
   const uu: string = uuid()
-  expect(uu).not.toBeUndefined()
+  it('UUID must be defined', () => {
+    expect(uu).not.toBeUndefined()
+  })
+  it('Actual test', () => {
+    return undefined
+  })
 })

@@ -1,4 +1,4 @@
-
+import { CfnAuthorizer } from '@aws-cdk/aws-apigateway'
 import cdk = require('@aws-cdk/core');
 import lambda = require('@aws-cdk/aws-lambda');
 import apigw = require('@aws-cdk/aws-apigateway');
@@ -10,21 +10,22 @@ export interface CommandStackProps {
 export class CommandStack extends cdk.Construct {
   /** @returns the ARN of the API Gateway */
   public readonly apiArn: string;
-  private readonly ddbTable: ddb.Table;
-  private readonly lambdaRestApi: apigw.LambdaRestApi;
+  public readonly ddbTable: ddb.Table;
+  public readonly lambdaRestApi: apigw.LambdaRestApi;
+  public readonly ttlAttrib: string;
 
   constructor (scope: cdk.Construct, id: string, props: CommandStackProps = {}) {
     super(scope, id)
-    // S3
 
     // Dynamo DB
+    this.ttlAttrib = 'ddbTtl'
     this.ddbTable = new ddb.Table(this, 'CommandsTable', {
       tableName: 'CommandsTable',
-      readCapacity: 50,
+      readCapacity: 40,
       serverSideEncryption: true,
       stream: ddb.StreamViewType.NEW_AND_OLD_IMAGES,
       pointInTimeRecovery: true,
-
+      timeToLiveAttribute: this.ttlAttrib,
       partitionKey: {
         name: 'itemId',
         type: ddb.AttributeType.STRING
@@ -34,10 +35,6 @@ export class CommandStack extends cdk.Construct {
       // DESTROY, cdk destroy will delete the table (even if it has data in it)
       removalPolicy: cdk.RemovalPolicy.DESTROY // NOT recommended for production code
     })
-    this.ddbTable.autoScaleWriteCapacity({
-      minCapacity: 2,
-      maxCapacity: 10
-    })
     // Lambda
     const putCommandHandler: lambda.Function = new lambda.Function(this, 'put_command', {
       runtime: lambda.Runtime.NODEJS_10_X,
@@ -45,8 +42,14 @@ export class CommandStack extends cdk.Construct {
       handler: 'put_command.putCommand',
       environment: {
         TABLE_NAME: this.ddbTable.tableName,
-        PRIMARY_KEY: 'itemId'
+        PRIMARY_KEY: 'itemId',
+        TTL: this.ttlAttrib
       }
+    })
+
+    this.ddbTable.autoScaleWriteCapacity({
+      minCapacity: 2,
+      maxCapacity: 10
     })
     // better grant the writing right to the lambda ;) if you want to write
     this.ddbTable.grantReadWriteData(putCommandHandler)
@@ -58,8 +61,16 @@ export class CommandStack extends cdk.Construct {
       proxy: false,
       handler: putCommandHandler
     })
-    this.lambdaRestApi.root.addMethod('POST')
-
+    this.lambdaRestApi.root.addMethod('POST', new apigw.LambdaIntegration(putCommandHandler, {
+      allowTestInvoke: true
+    }))
+    // TOFIX: discover the arn of the cognito pool
+    const auth = new CfnAuthorizer(this, 'USerPool', {
+      restApiId: this.lambdaRestApi.restApiId,
+      type: apigw.AuthorizationType.COGNITO,
+      providerArns: ['']
+    })
+    //
     this.apiArn = this.lambdaRestApi.arnForExecuteApi()
   };
 };

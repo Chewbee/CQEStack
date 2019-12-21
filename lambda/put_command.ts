@@ -1,3 +1,4 @@
+import { } from '../lib/command_stack'
 import uuid = require ('uuid');
 import AWS = require('aws-sdk');
 const db = new AWS.DynamoDB.DocumentClient()
@@ -12,11 +13,14 @@ export const putCommand = async (event: any = {}): Promise<any> => {
   if (!event.body) {
     return { statusCode: 400, body: 'invalid request, you are missing the parameter body' }
   }
+  const ddbTtl = '604800' // 1 week
   const item = typeof event.body === 'object' ? event.body : JSON.parse(event.body)
   item[PRIMARY_KEY] = uuid()
   const params = {
     TableName: TABLE_NAME,
-    Item: item
+    Item: item,
+    ddbTtl: process.env.TTL
+    // should have TTL ?
   }
   try {
     await db.put(params).promise()
