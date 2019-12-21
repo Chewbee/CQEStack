@@ -120,8 +120,9 @@ Object {
     },
     "CommandStackUSerPoolE47D6B67": Object {
       "Properties": Object {
+        "Name": "UserPoolAuthorizer",
         "ProviderARNs": Array [
-          "",
+          "arn:aws:cognito-idp:eu-west-1:384547244036:userpool/eu-west-1_mhbaJ4zc0",
         ],
         "RestApiId": Object {
           "Ref": "CommandStackrestAPI3679B2B9",
@@ -180,7 +181,6 @@ Object {
             "TABLE_NAME": Object {
               "Ref": "CommandStackCommandsTable15B01C37",
             },
-            "TTL": "ddbTtl",
           },
         },
         "Handler": "put_command.putCommand",

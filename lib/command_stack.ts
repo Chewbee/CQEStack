@@ -13,6 +13,17 @@ export class CommandStack extends cdk.Construct {
   public readonly ddbTable: ddb.Table;
   public readonly lambdaRestApi: apigw.LambdaRestApi;
   public readonly ttlAttrib: string;
+  private authorizer: CfnAuthorizer ;
+
+  private addAuthorizer (stack: CommandStack) {
+    // TOFIX: discover the arn of the cognito pool, instead of using magic number - Pool Id eu-west-1_mhbaJ4zc0
+    stack.authorizer = new CfnAuthorizer(stack, 'USerPool', {
+      name: 'UserPoolAuthorizer',
+      restApiId: stack.lambdaRestApi.restApiId,
+      type: apigw.AuthorizationType.COGNITO,
+      providerArns: ['arn:aws:cognito-idp:eu-west-1:384547244036:userpool/eu-west-1_mhbaJ4zc0']
+    })
+  }
 
   constructor (scope: cdk.Construct, id: string, props: CommandStackProps = {}) {
     super(scope, id)
@@ -42,8 +53,8 @@ export class CommandStack extends cdk.Construct {
       handler: 'put_command.putCommand',
       environment: {
         TABLE_NAME: this.ddbTable.tableName,
-        PRIMARY_KEY: 'itemId',
-        TTL: this.ttlAttrib
+        PRIMARY_KEY: 'itemId'
+        //  TTL: this.ttlAttrib
       }
     })
 
@@ -64,13 +75,7 @@ export class CommandStack extends cdk.Construct {
     this.lambdaRestApi.root.addMethod('POST', new apigw.LambdaIntegration(putCommandHandler, {
       allowTestInvoke: true
     }))
-    // TOFIX: discover the arn of the cognito pool
-    const auth = new CfnAuthorizer(this, 'USerPool', {
-      restApiId: this.lambdaRestApi.restApiId,
-      type: apigw.AuthorizationType.COGNITO,
-      providerArns: ['']
-    })
-    //
     this.apiArn = this.lambdaRestApi.arnForExecuteApi()
+    this.addAuthorizer(this)
   };
 };
