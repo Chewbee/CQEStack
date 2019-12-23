@@ -1,13 +1,12 @@
-
 import { expect as expectCDK, haveResource } from '@aws-cdk/assert'
-import { OpenBankingStack } from '../lib/open_banking-stack'
+import { OpenBankingStack } from '../src/open_banking-stack'
 import cdk = require('@aws-cdk/core');
 
 describe('Open Banking Stacks Tests', () => {
   const app = new cdk.App()
   const stack = new OpenBankingStack(app, 'TestOpenBankingStack')
 
-  it(' It Should contain a lambda function', () => {
+  it('It Should contain a lambda function', () => {
     expectCDK(stack).to(haveResource('AWS::Lambda::Function', {
       Runtime: 'nodejs10.x',
       Handler: 'put_command.putCommand'
@@ -19,11 +18,9 @@ describe('Open Banking Stacks Tests', () => {
       Description: 'This service receives the command'
     }))
   })
-  /*
   it('Should have an API Gateway with a POST handler @ root', () => {
-    expect(stack.commands.lambdaRestApi).toHaveProperty()
+    expect(stack.commands.lambdaRestApi.restApiRootResourceId)
   })
-  */
   it('It Should have a DynamoDB', () => {
     expectCDK(stack).to(haveResource('AWS::DynamoDB::Table', {
       TableName: 'CommandsTable'

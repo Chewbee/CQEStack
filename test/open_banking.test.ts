@@ -1,8 +1,8 @@
 import { SynthUtils } from '@aws-cdk/assert'
-import cdk = require('@aws-cdk/core');
-import OpenBanking = require('../lib/open_banking-stack');
+import cdk = require('@aws-cdk/core')
+import OpenBanking = require('../src/open_banking-stack')
 
-test('Stack built', () => {
+test('Stack is conform with snapshot', () => {
   const app = new cdk.App()
   // WHEN
   const stack = new OpenBanking.OpenBankingStack(app, 'MyTestStack')

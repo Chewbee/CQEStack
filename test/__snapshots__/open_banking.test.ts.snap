@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Stack built 1`] = `
+exports[`Stack is conform with snapshot 1`] = `
 Object {
   "Outputs": Object {
     "CommandStackrestAPIEndpoint57446DD7": Object {
@@ -84,7 +84,7 @@ Object {
     },
     "CommandStackCommandsTableWriteScalingTargetF7B52318": Object {
       "Properties": Object {
-        "MaxCapacity": 10,
+        "MaxCapacity": 80,
         "MinCapacity": 2,
         "ResourceId": Object {
           "Fn::Join": Array [
@@ -257,6 +257,11 @@ Object {
     "CommandStackrestAPI3679B2B9": Object {
       "Properties": Object {
         "Description": "This service receives the command",
+        "EndpointConfiguration": Object {
+          "Types": Array [
+            "EDGE",
+          ],
+        },
         "Name": "Put Command Service",
       },
       "Type": "AWS::ApiGateway::RestApi",

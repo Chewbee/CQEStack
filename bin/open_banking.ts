@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 import 'source-map-support/register'
-import { OpenBankingStack } from '../lib/open_banking-stack'
-import cdk = require('@aws-cdk/core');
+
+import { OpenBankingStack } from '../src/open_banking-stack'
+
+import cdk = require('@aws-cdk/core')
 
 const app = new cdk.App()
-new OpenBankingStack(app, 'OpenBankingStack')
+const stack = new OpenBankingStack(app, 'OpenBankingStack')

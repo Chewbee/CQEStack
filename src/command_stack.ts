@@ -1,10 +1,11 @@
-import { CfnAuthorizer } from '@aws-cdk/aws-apigateway'
-import cdk = require('@aws-cdk/core');
-import lambda = require('@aws-cdk/aws-lambda');
+import { AuthorizationType, CfnAuthorizer, EndpointType } from '@aws-cdk/aws-apigateway'
 import apigw = require('@aws-cdk/aws-apigateway');
 import ddb = require('@aws-cdk/aws-dynamodb');
+import lambda = require('@aws-cdk/aws-lambda');
+import cdk = require('@aws-cdk/core');
 
-export interface CommandStackProps {
+export interface CommandStackProps
+{
 }
 
 export class CommandStack extends cdk.Construct {
@@ -13,14 +14,15 @@ export class CommandStack extends cdk.Construct {
   public readonly ddbTable: ddb.Table;
   public readonly lambdaRestApi: apigw.LambdaRestApi;
   public readonly ttlAttrib: string;
-  private authorizer: CfnAuthorizer ;
+  private authorizer: CfnAuthorizer;
 
   private addAuthorizer (stack: CommandStack) {
     // TOFIX: discover the arn of the cognito pool, instead of using magic number - Pool Id eu-west-1_mhbaJ4zc0
-    stack.authorizer = new CfnAuthorizer(stack, 'UserPool', {
+    stack.authorizer = new CfnAuthorizer(stack, 'OB-POOL', {
       name: 'UserPoolAuthorizer',
       restApiId: stack.lambdaRestApi.restApiId,
-      type: apigw.AuthorizationType.COGNITO,
+      type: AuthorizationType.COGNITO,
+      authType: AuthorizationType.COGNITO,
       providerArns: ['arn:aws:cognito-idp:eu-west-1:384547244036:userpool/eu-west-1_mhbaJ4zc0']
     })
   }
@@ -60,7 +62,7 @@ export class CommandStack extends cdk.Construct {
 
     this.ddbTable.autoScaleWriteCapacity({
       minCapacity: 2,
-      maxCapacity: 10
+      maxCapacity: 80
     })
     // better grant the writing right to the lambda ;) if you want to write
     this.ddbTable.grantReadWriteData(putCommandHandler)
@@ -70,7 +72,9 @@ export class CommandStack extends cdk.Construct {
       restApiName: 'Put Command Service',
       description: 'This service receives the command',
       proxy: false,
-      handler: putCommandHandler
+      handler: putCommandHandler,
+      defaultMethodOptions: undefined,
+      endpointTypes: [EndpointType.EDGE]
     })
     this.lambdaRestApi.root.addMethod('POST', new apigw.LambdaIntegration(putCommandHandler, {
       allowTestInvoke: true
