@@ -1,5 +1,5 @@
-import AWS = require('aws-sdk');
-import uuid = require('uuid');
+import AWS = require('aws-sdk')
+import uuid = require('uuid')
 
 const db = new AWS.DynamoDB.DocumentClient()
 
@@ -9,18 +9,18 @@ const RESERVED_RESPONSE = 'Error: You\'re using AWS reserved keywords as attribu
 const DYNAMODB_EXECUTION_ERROR = 'Error: Execution update, caused a Dynamodb error, please take a look at your CloudWatch Logs.'
 
 // export function put_command( msg: object ) {
-export const putCommand = async (event: any = {}): Promise<any> => {
+export const handler = async (event: any = {}): Promise<any> => {
+  // reject when there is no body
   if (!event.body) {
     return { statusCode: 400, body: 'invalid request, you are missing the parameter body' }
   }
-  // const ddbTtl = '604800' // 1 week
+  const ddbTtl = '604800' // 1 week
   const item = typeof event.body === 'object' ? event.body : JSON.parse(event.body)
   item[PRIMARY_KEY] = uuid()
   const params = {
     TableName: TABLE_NAME,
     Item: item,
-    ddbTtl: process.env.TTL
-    // should have TTL ?
+    ddbTtl: ddbTtl
   }
   try {
     await db.put(params).promise()

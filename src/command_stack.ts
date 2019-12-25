@@ -1,23 +1,28 @@
+/* eslint-disable no-unused-vars */
 import { AuthorizationType, CfnAuthorizer, EndpointType } from '@aws-cdk/aws-apigateway'
-import apigw = require('@aws-cdk/aws-apigateway');
-import ddb = require('@aws-cdk/aws-dynamodb');
+import { DynamoEventSource } from '@aws-cdk/aws-lambda-event-sources'
+import { StackProps, Stack } from '@aws-cdk/core'
+import APIGateway = require('@aws-cdk/aws-apigateway');
+import dynamoDB = require('@aws-cdk/aws-dynamodb');
 import lambda = require('@aws-cdk/aws-lambda');
 import cdk = require('@aws-cdk/core');
 
-export interface CommandStackProps
+export interface CommandStackProps extends StackProps
 {
 }
 
 export class CommandStack extends cdk.Construct {
   /** @returns the ARN of the API Gateway */
   public readonly apiArn: string;
-  public readonly ddbTable: ddb.Table;
-  public readonly lambdaRestApi: apigw.LambdaRestApi;
+  public readonly ddbTable: dynamoDB.Table;
+  public readonly lambdaRestApi: APIGateway.LambdaRestApi;
+  public readonly putCommandHandler: lambda.Function;
+  public readonly turnCommandsIntoEvents: lambda.Function;
   public readonly ttlAttrib: string;
   private authorizer: CfnAuthorizer;
 
   private addAuthorizer (stack: CommandStack) {
-    // TOFIX: discover the arn of the cognito pool, instead of using magic number - Pool Id eu-west-1_mhbaJ4zc0
+    // FIXME: discover the arn of the cognito pool, instead of using magic number - Pool Id eu-west-1_mhbaJ4zc0
     stack.authorizer = new CfnAuthorizer(stack, 'OB-POOL', {
       name: 'UserPoolAuthorizer',
       restApiId: stack.lambdaRestApi.restApiId,
@@ -32,16 +37,16 @@ export class CommandStack extends cdk.Construct {
 
     // Dynamo DB
     this.ttlAttrib = 'ddbTtl'
-    this.ddbTable = new ddb.Table(this, 'CommandsTable', {
+    this.ddbTable = new dynamoDB.Table(this, 'CommandsTable', {
       tableName: 'CommandsTable',
       readCapacity: 40,
       serverSideEncryption: true,
-      stream: ddb.StreamViewType.NEW_AND_OLD_IMAGES,
+      stream: dynamoDB.StreamViewType.NEW_AND_OLD_IMAGES,
       pointInTimeRecovery: true,
-      timeToLiveAttribute: this.ttlAttrib,
+      timeToLiveAttribute: 'ddbTtl',
       partitionKey: {
         name: 'itemId',
-        type: ddb.AttributeType.STRING
+        type: dynamoDB.AttributeType.STRING
       },
       // The default removal policy is RETAIN, which means that cdk destroy will not attempt to delete
       // the new table, and it will remain in your account until manually deleted. By setting the policy to
@@ -49,36 +54,52 @@ export class CommandStack extends cdk.Construct {
       removalPolicy: cdk.RemovalPolicy.DESTROY // NOT recommended for production code
     })
     // Lambda
-    const putCommandHandler: lambda.Function = new lambda.Function(this, 'put_command', {
+    this.putCommandHandler = new lambda.Function(this, 'put_command', {
       runtime: lambda.Runtime.NODEJS_10_X,
       code: lambda.Code.fromAsset('lambda'),
-      handler: 'put_command.putCommand',
+      handler: 'putCommands.handler',
       environment: {
         TABLE_NAME: this.ddbTable.tableName,
         PRIMARY_KEY: 'itemId'
         //  TTL: this.ttlAttrib
       }
     })
+    // the lambda to process the DDB Stream
+    this.turnCommandsIntoEvents = new lambda.Function(this, 'turnCommandsIntoEvents', {
+      runtime: lambda.Runtime.NODEJS_10_X,
+      code: lambda.Code.fromAsset(('lambda')),
+      handler: 'turnCommandsIntoEvents.handler'
+    })
+
+    // define the table as the Dynamo DB table as the Dynamo source
+    this.turnCommandsIntoEvents.addEventSource(new DynamoEventSource(this.ddbTable, {
+      startingPosition: lambda.StartingPosition.TRIM_HORIZON,
+      batchSize: 1
+    }))
+    // to grant the rights to list the DDB Stream
+    dynamoDB.Table.grantListStreams(this.turnCommandsIntoEvents)
 
     this.ddbTable.autoScaleWriteCapacity({
       minCapacity: 2,
       maxCapacity: 80
     })
     // better grant the writing right to the lambda ;) if you want to write
-    this.ddbTable.grantReadWriteData(putCommandHandler)
+    this.ddbTable.grantReadWriteData(this.putCommandHandler)
 
     // API Gateway
-    this.lambdaRestApi = new apigw.LambdaRestApi(this, 'restAPI', {
+    this.lambdaRestApi = new APIGateway.LambdaRestApi(this, 'restAPI', {
       restApiName: 'Put Command Service',
       description: 'This service receives the command',
       proxy: false,
-      handler: putCommandHandler,
+      handler: this.putCommandHandler,
       defaultMethodOptions: undefined,
       endpointTypes: [EndpointType.EDGE]
     })
-    this.lambdaRestApi.root.addMethod('POST', new apigw.LambdaIntegration(putCommandHandler, {
+
+    this.lambdaRestApi.root.addMethod('POST', new APIGateway.LambdaIntegration(this.putCommandHandler, {
       allowTestInvoke: true
     }))
+
     this.apiArn = this.lambdaRestApi.arnForExecuteApi()
     // this.addAuthorizer(this)
   };

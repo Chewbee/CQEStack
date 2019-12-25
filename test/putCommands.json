@@ -1,0 +1,8 @@
+{
+	"itemId": "valitemId",
+	"body": {
+		"payload": {
+			"car": null
+		}
+	}
+}
