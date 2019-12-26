@@ -1,7 +1,7 @@
-import AWS = require('aws-sdk')
+import { DynamoDB } from 'aws-sdk'
 import uuid = require('uuid')
 
-const db = new AWS.DynamoDB.DocumentClient()
+const dynamoDBClient = new DynamoDB.DocumentClient()
 
 const TABLE_NAME = process.env.TABLE_NAME || 'commandsTable'
 const PRIMARY_KEY = process.env.PRIMARY_KEY || 'itemId'
@@ -23,7 +23,7 @@ export const handler = async (event: any = {}): Promise<any> => {
     ddbTtl: ddbTtl
   }
   try {
-    await db.put(params).promise()
+    await dynamoDBClient.put(params).promise()
     return { statusCode: 201, body: event.body }
   } catch (dbError) {
     const errorResponse = dbError.code === 'ValidationException' && dbError.message.includes('reserved keyword')

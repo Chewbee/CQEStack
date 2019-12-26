@@ -1,22 +1,24 @@
 {
-  "name": "open_banking",
+  "name": "CQE",
   "version": "0.1.0",
   "bin": {
-    "open_banking": "bin/open_banking.js"
+    "open_banking": "bin/CQE.js"
   },
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
-    "test": "jest ",
+    "test": "jest --verbose",
     "cdk": "cdk diff"
   },
   "devDependencies": {
     "@aws-cdk/assert": "^1.19.0",
     "@aws-cdk/aws-apigateway": "^1.19.0",
     "@aws-cdk/aws-dynamodb": "^1.19.0",
+    "@aws-cdk/aws-eventschemas": "^1.19.0",
     "@aws-cdk/aws-kinesisfirehose": "^1.19.0",
     "@aws-cdk/aws-lambda": "^1.19.0",
     "@aws-cdk/aws-lambda-destinations": "^1.19.0",
+    "@aws-cdk/aws-lambda-event-sources": "^1.19.0",
     "@aws-cdk/aws-s3": "^1.19.0",
     "@awspilot/dynamodb": "^2.0.0",
     "@types/aws-lambda": "^8.10.39",
@@ -44,7 +46,6 @@
     "uuid": "^3.3.3"
   },
   "dependencies": {
-    "@aws-cdk/aws-lambda-event-sources": "^1.19.0",
     "@aws-cdk/core": "^1.19.0",
     "@types/source-map-support": "^0.5.0",
     "source-map-support": "^0.5.16"

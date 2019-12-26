@@ -1,9 +1,10 @@
-#!/usr/bin/env node
+#!/usr/bin / env node
+/* eslint-disable no-unused-vars */
 import 'source-map-support/register'
 
 import { CQEStack } from '../src/CQEStack'
 
-import * as cdk from '@aws-cdk/core'
+import { App } from '@aws-cdk/core'
 
-const app = new cdk.App()
+const app = new App()
 const stack = new CQEStack(app, 'CQEStack')

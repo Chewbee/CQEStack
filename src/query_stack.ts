@@ -1,28 +1,21 @@
-import { StackProps } from '@aws-cdk/core'
-import lambda = require('@aws-cdk/aws-lambda')
-import cdk = require('@aws-cdk/core')
+/* eslint-disable no-unused-vars */
+import { StackProps, Construct } from '@aws-cdk/core'
+import { EventBridgeDestination } from '@aws-cdk/aws-lambda-destinations'
+import { Function as LambdaFunction, Runtime, Code } from '@aws-cdk/aws-lambda'
 
 export interface QueryStackProps extends StackProps
 {
 }
+export class QueryStack extends Construct {
+  private getStatus: LambdaFunction
 
-export class QueryStack extends cdk.Construct {
- private getStatus: lambda.Function
- private addGetStatus (stack: QueryStack) {
-   this.getStatus = new lambda.Function(stack, 'getStatus', {
-     runtime: lambda.Runtime.NODEJS_10_X,
-     code: lambda.Code.fromAsset('lambda'),
-     handler: 'getStatus.handler'
-   })
- }
+  constructor (scope: Construct, id: string, props: QueryStackProps = {}) {
+    super(scope, id)
 
- constructor (scope: cdk.Construct, id: string, props: QueryStackProps = {}) {
-   super(scope, id)
-
-   this.getStatus = new lambda.Function(this, 'getStatus', {
-     runtime: lambda.Runtime.NODEJS_10_X,
-     code: lambda.Code.fromAsset('lambda'),
-     handler: 'getStatus.handler'
-   })
- }
+    this.getStatus = new LambdaFunction(this, 'getStatus', {
+      runtime: Runtime.NODEJS_10_X,
+      code: Code.fromAsset('lambda'),
+      handler: 'getStatus.handler'
+    })
+  }
 }
