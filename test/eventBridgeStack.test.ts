@@ -9,18 +9,15 @@ describe('event Bridge Test suite', () => {
   const stack = new CQEStack(app, 'TestCQEStack')
   // THEN
   it('EventBridgeStack should contain a bucket', () => {
-    expectCDK(stack.eventBridge).to(haveResource('AWS::S3::Bucket'))
+    expectCDK(stack).to(haveResource('AWS::S3::Bucket'))
   })
   it('EventBridgeStack should contain a role', () => {
-    expectCDK(stack.eventBridge).to(haveResource('AWS::IAM::Role', {}))
+    expectCDK(stack).to(haveResource('AWS::IAM::Role', {}))
   })
   it('EventBridgeStack should contain a delivery stream', () => {
-    expectCDK(stack.eventBridge).to(haveResource('AWS::KinesisFirehose::DeliveryStream', {}))
-  })
-  it('EventBridgeStack should contain an EventBridgeStack', () => {
-    expect(stack.eventBridge).toBeInstanceOf(EventBridgeStack)
+    expectCDK(stack).to(haveResource('AWS::KinesisFirehose::DeliveryStream', {}))
   })
   it('EventBridgeStack should contain an EventBus', () => {
-    expectCDK(stack.eventBridge).to(haveResource('AWS::Events::EventBus', {}))
+    expectCDK(stack).to(haveResource('AWS::Events::EventBus', {}))
   })
 })

@@ -12,7 +12,7 @@ export interface EventBridgeStackProps extends StackProps
 {
   command2events: LambdaFunction
 }
-export class EventBridgeStack extends Stack {
+export class EventBridgeStack extends Construct {
   public readonly eventBus: EventBus
   constructor (scope: Construct, id: string, props: EventBridgeStackProps) {
     super(scope, id)
