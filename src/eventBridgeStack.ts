@@ -8,13 +8,13 @@ import { Bucket } from '@aws-cdk/aws-s3'
 import { EventBridgeDestination } from '@aws-cdk/aws-lambda-destinations'
 import { Function as LambdaFunction } from '@aws-cdk/aws-lambda'
 
-export interface EventBridgeStackProps extends StackProps
+export interface EventBridgeConstructProps extends StackProps
 {
   command2events: LambdaFunction
 }
-export class EventBridgeStack extends Construct {
+export class EventBridgeConstruct extends Construct {
   public readonly eventBus: EventBus
-  constructor (scope: Construct, id: string, props: EventBridgeStackProps) {
+  constructor (scope: Construct, id: string, props: EventBridgeConstructProps) {
     super(scope, id)
     // Create S3 bucket for the event store
     const bucket = new Bucket(this, 'EventBridgeS3DestinationBucket')
@@ -23,7 +23,7 @@ export class EventBridgeStack extends Construct {
       assumedBy: new ServicePrincipal('firehose.amazonaws.com')
     })
     // Create the Firehose with connection to S3, assign role and config
-    const deliveryStream = new CfnDeliveryStream(this, 'firehose', {
+    const deliveryStream = new CfnDeliveryStream(this, 'KinesisFirehose', {
       deliveryStreamName: 'CQE-delivery-stream',
       deliveryStreamType: 'DirectPut',
       s3DestinationConfiguration: {

@@ -23,7 +23,7 @@ describe('Command Stack Tests', () => {
   it('It Should have an API Gateway Created', () => {
     expectCDK(stack).to(haveResource('AWS::ApiGateway::RestApi', {
       Name: 'Put Command Service',
-      Description: 'This service receives the command'
+      Description: 'This service receives the PutCommands calls'
     }))
   })
 

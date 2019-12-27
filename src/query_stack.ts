@@ -6,7 +6,7 @@ import { Function as LambdaFunction, Runtime, Code } from '@aws-cdk/aws-lambda'
 export interface QueryStackProps extends StackProps
 {
 }
-export class QueryStack extends Construct {
+export class QueryConstruct extends Construct {
   private getStatus: LambdaFunction
 
   constructor (scope: Construct, id: string, props: QueryStackProps = {}) {

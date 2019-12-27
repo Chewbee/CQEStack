@@ -1,6 +1,6 @@
 import { expect as expectCDK, haveResource } from '@aws-cdk/assert'
 import { CQEStack } from '../src/CQEStack'
-import { EventBridgeStack } from '../src/eventBridgeStack'
+import { EventBridgeConstruct } from '../src/eventBridgeStack'
 import { App } from '@aws-cdk/core'
 
 describe('event Bridge Test suite', () => {

@@ -5,11 +5,11 @@ import { LambdaRestApi, CfnAuthorizer, AuthorizationType, EndpointType, LambdaIn
 import { Table as DynamoDBTable, StreamViewType, AttributeType } from '@aws-cdk/aws-dynamodb'
 import { Function as LambdaFunction, Code, Runtime, StartingPosition } from '@aws-cdk/aws-lambda'
 
-export interface CommandStackProps extends StackProps
+export interface CommandConstructProps extends StackProps
 {
 }
 
-export class CommandStack extends Construct {
+export class CommandConstruct extends Construct {
   public readonly apiArn: string;
   public readonly ddbTable: DynamoDBTable;
   public readonly lambdaRestApi: LambdaRestApi;
@@ -18,7 +18,7 @@ export class CommandStack extends Construct {
   public readonly ttlAttrib: string;
   private authorizer: CfnAuthorizer;
 
-  private addAuthorizer (stack: CommandStack) {
+  private addAuthorizer (stack: CommandConstruct) {
     // FIXME: discover the arn of the cognito pool, instead of using magic number - Pool Id eu-west-1_mhbaJ4zc0
     stack.authorizer = new CfnAuthorizer(stack, 'OB-POOL', {
       name: 'UserPoolAuthorizer',
@@ -29,7 +29,7 @@ export class CommandStack extends Construct {
     })
   }
 
-  constructor (scope: Construct, id: string, props: CommandStackProps = {}) {
+  constructor (scope: Construct, id: string, props: CommandConstructProps = {}) {
     super(scope, id)
     // Dynamo DB
     this.ttlAttrib = 'ddbTtl'
@@ -50,7 +50,7 @@ export class CommandStack extends Construct {
       removalPolicy: RemovalPolicy.DESTROY // NOT recommended for production code
     })
     // Lambda
-    this.putCommandHandler = new LambdaFunction(this, 'put_command', {
+    this.putCommandHandler = new LambdaFunction(this, 'PutCommands', {
       runtime: Runtime.NODEJS_10_X,
       code: Code.fromAsset('lambda'),
       handler: 'putCommands.handler',
@@ -85,7 +85,7 @@ export class CommandStack extends Construct {
     // API Gateway
     this.lambdaRestApi = new LambdaRestApi(this, 'restAPI', {
       restApiName: 'Put Command Service',
-      description: 'This service receives the command',
+      description: 'This service receives the PutCommands calls',
       proxy: false,
       handler: this.putCommandHandler,
       defaultMethodOptions: undefined,
