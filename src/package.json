@@ -11,7 +11,6 @@
   "devDependencies": {
     "@aws-cdk/aws-events": "^1.19.0",
     "@aws-cdk/aws-lambda": "^1.19.0",
-    "@aws-cdk/aws-lambda-destinations": "^1.19.0",
     "@types/aws-sdk": "^2.7.0"
   }
 }

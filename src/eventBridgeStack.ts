@@ -5,7 +5,7 @@ import { EventBus, Rule, RuleTargetInput } from '@aws-cdk/aws-events'
 import { Stack, StackProps, Construct } from '@aws-cdk/core'
 import { Role, ServicePrincipal } from '@aws-cdk/aws-iam'
 import { Bucket } from '@aws-cdk/aws-s3'
-import { EventBridgeDestination } from '@aws-cdk/aws-lambda-destinations'
+// import { EventBridgeDestination } from '@aws-cdk/aws-lambda-destinations'
 import { Function as LambdaFunction } from '@aws-cdk/aws-lambda'
 
 export interface EventBridgeConstructProps extends StackProps
@@ -44,10 +44,11 @@ export class EventBridgeConstruct extends Construct {
       }
     })
     this.eventBus = new EventBus(this, 'CQEEventBus')
-
+    /*
     if (props) {
       const eventBridgeDestination = new EventBridgeDestination(this.eventBus)
       eventBridgeDestination.bind(deliveryStream, props.command2events)
     }
+    */
   }
 }

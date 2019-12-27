@@ -1,6 +1,5 @@
 /* eslint-disable no-unused-vars */
 import { StackProps, Construct } from '@aws-cdk/core'
-import { EventBridgeDestination } from '@aws-cdk/aws-lambda-destinations'
 import { Function as LambdaFunction, Runtime, Code } from '@aws-cdk/aws-lambda'
 
 export interface QueryStackProps extends StackProps
