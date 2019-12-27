@@ -1,8 +1,12 @@
 /* eslint-disable no-unused-vars */
 import { DynamoDB, DynamoDBStreams } from 'aws-sdk'
 
-export async function handler (event:Array<object>, context: object): Promise<any> {
+export async function handler (event: any = {}, context: object): Promise<any> {
   console.log('Fired turnCommandsIntoEvents ! ')
+  if (!event.body) {
+    return { statusCode: 400, body: 'invalid request, you are missing the parameter body' }
+  }
+  const item = typeof event.body === 'object' ? event.body : JSON.parse(event.body)
   /*
   event.Records.forEach((record) => {
     console.log('Stream record: ', JSON.stringify(record, null, 2))
@@ -25,5 +29,5 @@ export async function handler (event:Array<object>, context: object): Promise<an
       }
     }
     */
-  return { statusCode: 500 }
+  return { statusCode: 201, body: event.body }
 }

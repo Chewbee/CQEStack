@@ -1,5 +1,5 @@
 {
-  "name": "CQE",
+  "name": "cqe",
   "version": "0.1.0",
   "bin": {
     "open_banking": "bin/CQE.js"
@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
-    "test": "jest --verbose",
+    "test": "jest --verbose --coverage",
     "cdk": "cdk diff"
   },
   "devDependencies": {
