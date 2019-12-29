@@ -8,3 +8,6 @@ coverage/
 cdk.out
 .DS_Store
 jest_html_reporters.html
+README_tmp.html
+WorkInProgress.pptx
+.vscode/settings.json
